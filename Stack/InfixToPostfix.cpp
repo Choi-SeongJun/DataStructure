@@ -130,6 +130,7 @@ void infix_to_postfix(const char exp[])
 }
 */
 
+/* switch문을 활용한 두번째 코드 */
 void infix_to_postfix(const char exp[])
 {
 	int i, p;
@@ -142,7 +143,7 @@ void infix_to_postfix(const char exp[])
 	{
 		ch = exp[i];
 		p = prec(ch);
-		
+		printf("\n%d. ", i+1);
 		switch(p)
 		{
 			case -1:
@@ -164,7 +165,7 @@ void infix_to_postfix(const char exp[])
 				if(is_empty(&s))
 					push(&s, ch);
 				else if(p>prec(peek(&s)))
-					printf("%c", ch);
+					push(&s, ch); 
 				else
 				{
 					printf("%c", pop(&s));
@@ -178,10 +179,47 @@ void infix_to_postfix(const char exp[])
 		printf("%c", pop(&s));
 }
 
-
+/* 책에 나와있는 코드 */
+/*
+void infix_to_postfix(const char exp[])
+{
+	int i = 0;
+	char ch, top_op;
+	int len = strlen(exp);
+	LinkedStackType s;
+	
+	init(&s);
+	for(i=0; i<len; i++){
+		ch = exp[i];
+		switch(ch){
+			case '+': case '-': case '/': case '*':
+				while(!is_empty(&s) && (prec(ch) <= prec(peek(&s))))
+					printf("%c", pop(&s));
+				push(&s, ch);
+				break;
+			case '(':
+				push(&s, ch);
+				break;
+			case ')':
+				top_op = pop(&s);
+				while(top_op!='('){
+					printf("%c", top_op);
+					top_op = pop(&s);
+				}
+				break;
+			default:
+				printf("%c", ch);
+				break;
+		}
+	}
+	
+	while(!is_empty(&s))
+		printf("%c", pop(&s));
+}
+*/				
 int main(void)
 {
-	infix_to_postfix("(2+3)*4+9");
+	infix_to_postfix("5*(9+2)/2");
 	
 	return 0;
 }

@@ -2,10 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRUE 1
-#define FALSE 0
+#define MAZE_SIZE 6
 
-typedef int element;
+typedef struct{
+	short r;
+	short c;
+} element;
+
+element here = {1, 0}, entry = {1, 0};
+
+char maze[MAZE_SIZE][MAZE_SIZE] = {
+	{'1', '1', '1', '1', '1', '1'},
+	{'e', '0', '1', '0', '0', '1'},
+	{'1', '0', '0', '0', '1', '1'},
+	{'1', '0', '1', '0', '1', '1'},
+	{'1', '0', '1', '0', '0', 'x'},
+	{'1', '1', '1', '1', '1', '1'}
+};
 
 typedef struct StackNode{
 	element item;
@@ -70,41 +83,46 @@ element peek(LinkedStackType *s)
 		return s->top->item;
 }
 
-int eval(const char exp[])
+void push_loc(LinkedStackType *s, int r, int c)
 {
-	LinkedStackType s;
-	char ch;
-	int i, op1, op2;
-	init(&s);
-	
-	for(i=0; i<strlen(exp); i++)
+	if(r < 0 || c < 0)
+		return;
+	if(maze[r][c]!='1' && maze[r][c]!='.')
 	{
-		ch = exp[i];
-		
-		if((ch!='+')&&(ch!='-')&&(ch!='*')&&(ch!='/'))
-			push(&s, ch-'0');
-		else
-		{
-			op2 = pop(&s);
-			op1 = pop(&s);
-			switch(ch)
-			{
-				case '+': push(&s, op1+op2); break;
-				case '-': push(&s, op1-op2); break;
-				case '*': push(&s, op1*op2); break;
-				case '/': push(&s, op1/op2); break;
-			}
-		}
+		element tmp;
+		tmp.r = r;
+		tmp.c = c;
+		push(s, tmp);
 	}
-	return pop(&s);
 }
 
 int main(void)
 {
-	int result;
-	printf("후위표기식은 82/3-32*+\n");
-	result = eval("82/3-32*+");
-	printf("결과값은 %d\n", result);
+	int r, c;
+	LinkedStackType s;
 	
-	return 0;
+	init(&s);
+	here = entry;
+	while(maze[here.r][here.c]!='x')
+	{
+		r = here.r;
+		c = here.c;
+		
+		maze[r][c] = '.';
+		
+		push_loc(&s, r-1, c);
+		push_loc(&s, r+1, c);
+		push_loc(&s, r, c-1);
+		push_loc(&s, r, c+1);
+		
+		if(is_empty(&s))
+		{
+			printf("실패\n");
+			
+			return 0;
+		}
+		else
+			here = pop(&s);
+	}
+	printf("성공\n");
 }
